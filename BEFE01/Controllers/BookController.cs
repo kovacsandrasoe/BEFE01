@@ -1,6 +1,7 @@
 ﻿using BEFE01.Data;
 using BEFE01.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BEFE01.Controllers
 {
@@ -15,17 +16,19 @@ namespace BEFE01.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Book> GetBooks()
+        public async Task<List<Book>> GetBooks()
         {
-            var b = new Book()
-            {
-                Title = "The Great Gatsby",
-                Year = 1925
-            };
-            _context.Books.Add(b);
-            _context.SaveChanges();
-
-            return _context.Books.ToList();
+            return await _context.Books.ToListAsync();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBook(Book book)
+        {
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+
     }
 }
