@@ -1,0 +1,6 @@
+@BEFE01_HostAddress = http://localhost:5204
+
+GET {{BEFE01_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
