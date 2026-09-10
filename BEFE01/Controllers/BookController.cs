@@ -16,8 +16,12 @@ namespace BEFE01.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Book>> GetBooks()
+        public async Task<List<Book>> GetBooks([FromQuery] int? fromYear)
         {
+            if (fromYear.HasValue)
+            {
+                return await _context.Books.Where(b => b.Year >= fromYear.Value).ToListAsync();
+            }
             return await _context.Books.ToListAsync();
         }
 
@@ -29,6 +33,19 @@ namespace BEFE01.Controllers
                 return BadRequest("Title must be at least 3 characters long.");
             }
             _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBook(Guid id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return Ok();
         }
