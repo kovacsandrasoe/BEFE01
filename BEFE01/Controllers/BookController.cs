@@ -28,13 +28,25 @@ namespace BEFE01.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Book>> GetBooks([FromQuery] int? fromYear)
+        public async Task<List<BookViewDto>> GetBooks([FromQuery] int? fromYear)
         {
             if (fromYear.HasValue)
             {
-                return await _context.Books.Where(b => b.Year >= fromYear.Value).ToListAsync();
+                return await _context.Books.Where(b => b.Year >= fromYear.Value).Select(b => new BookViewDto
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Year = b.Year,
+                    AuthorName = b.Author != null ? b.Author.Name : string.Empty
+                }).ToListAsync();
             }
-            return await _context.Books.ToListAsync();
+            return await _context.Books.Select(b => new BookViewDto
+            {
+                Id = b.Id,
+                Title = b.Title,
+                Year = b.Year,
+                AuthorName = b.Author != null ? b.Author.Name : string.Empty
+            }).ToListAsync();
         }
 
         [HttpPost]
