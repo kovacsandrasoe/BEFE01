@@ -16,6 +16,17 @@ namespace BEFE01.Controllers
             _context = context;
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Book>> GetBook(Guid id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return book;
+        }
+
         [HttpGet]
         public async Task<List<Book>> GetBooks([FromQuery] int? fromYear)
         {
