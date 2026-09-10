@@ -1,4 +1,5 @@
 ﻿using BEFE01.Data;
+using BEFE01.Dtos;
 using BEFE01.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,13 +27,17 @@ namespace BEFE01.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBook(Book book)
+        public async Task<IActionResult> CreateBook(BookCreateDto dto)
         {
-            if (book.Title.Length < 3)
+            if (dto.Title.Length < 3)
             {
                 return BadRequest("Title must be at least 3 characters long.");
             }
-            _context.Books.Add(book);
+            _context.Books.Add(new Book()
+            {
+                Title = dto.Title,
+                Year = dto.Year
+            });
             await _context.SaveChangesAsync();
             return Ok();
         }
