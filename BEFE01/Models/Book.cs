@@ -13,5 +13,7 @@ namespace BEFE01.Models
 
         public int Year { get; set; }
 
+        public Guid Author { get; set; }
+
     }
 }
