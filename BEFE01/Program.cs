@@ -14,7 +14,7 @@ namespace BEFE01
 
             builder.Services.AddDbContext<BookDbContext>(opt =>
             {
-                opt.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=BookDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True");
+                opt.UseSqlServer(builder.Configuration["db:conn"]);
             });
 
             builder.Services.AddControllers();
