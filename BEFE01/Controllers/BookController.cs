@@ -24,6 +24,10 @@ namespace BEFE01.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBook(Book book)
         {
+            if (book.Title.Length < 3)
+            {
+                return BadRequest("Title must be at least 3 characters long.");
+            }
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             return Ok();
