@@ -17,7 +17,15 @@ namespace BEFE01.Controllers
         [HttpGet]
         public IEnumerable<Book> GetBooks()
         {
-            
+            var b = new Book()
+            {
+                Title = "The Great Gatsby",
+                Year = 1925
+            };
+            _context.Books.Add(b);
+            _context.SaveChanges();
+
+            return _context.Books.ToList();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace BEFE01.Data
         public BookDbContext(DbContextOptions<BookDbContext> options)
             : base(options)
         {
-
+            Database.EnsureCreated();
         }
     }
 }
