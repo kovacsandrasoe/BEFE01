@@ -50,6 +50,24 @@ namespace BEFE01.Controllers
             return Ok();
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBook(Guid id, Book updatedBook)
+        {
+            if (id != updatedBook.Id)
+            {
+                return BadRequest("ID mismatch.");
+            }
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            book.Title = updatedBook.Title;
+            book.Year = updatedBook.Year;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
 
     }
 }
