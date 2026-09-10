@@ -13,7 +13,10 @@ namespace BEFE01.Models
 
         public int Year { get; set; }
 
-        public Guid Author { get; set; }
+        public Guid AuthorId { get; set; }
+
+        [NotMapped]
+        public virtual Person? Author { get; set; }
 
     }
 }

@@ -13,5 +13,8 @@ namespace BEFE01.Models
 
         public int Age { get; set; }
 
+        [NotMapped]
+        public virtual ICollection<Book>? Books { get; set; }
+
     }
 }
