@@ -1,4 +1,7 @@
 
+using BEFE01.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace BEFE01
 {
     public class Program
@@ -8,6 +11,11 @@ namespace BEFE01
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddDbContext<BookDbContext>(opt =>
+            {
+                opt.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=BookDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True");
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
