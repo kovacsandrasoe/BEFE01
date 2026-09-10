@@ -1,5 +1,6 @@
 ﻿using BEFE01.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace BEFE01.Data
 {
@@ -16,6 +17,11 @@ namespace BEFE01.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Book>()
+                .HasOne<Person>(t => t.Author)
+                .WithMany(t => t.Books)
+                .HasForeignKey(t => t.AuthorId);
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -14,7 +14,9 @@ namespace BEFE01
 
             builder.Services.AddDbContext<BookDbContext>(opt =>
             {
-                opt.UseSqlServer(builder.Configuration["db:conn"]);
+                opt
+                .UseSqlServer(builder.Configuration["db:conn"])
+                .UseLazyLoadingProxies();
             });
 
             builder.Services.AddControllers();
