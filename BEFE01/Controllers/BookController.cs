@@ -41,10 +41,6 @@ namespace BEFE01.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBook(BookCreateDto dto)
         {
-            if (dto.Title.Length < 3)
-            {
-                return BadRequest("Title must be at least 3 characters long.");
-            }
             var entity = _mapper.Map<Book>(dto);
             _context.Books.Add(entity);
             await _context.SaveChangesAsync();

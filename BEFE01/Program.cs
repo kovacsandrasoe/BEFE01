@@ -1,6 +1,7 @@
 
 using BEFE01.Data;
 using BEFE01.Tools;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEFE01
@@ -28,6 +29,12 @@ namespace BEFE01
             builder.Services.AddControllers(cfg =>
             {
                 cfg.Filters.Add<ExceptionFilter>();
+                cfg.Filters.Add<ValidationFilter>();
+            });
+
+            builder.Services.Configure<ApiBehaviorOptions>(opt =>
+            {
+                opt.SuppressModelStateInvalidFilter = true;
             });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
