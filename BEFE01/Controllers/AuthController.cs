@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace BEFE01.Controllers
 {
@@ -25,7 +26,7 @@ namespace BEFE01.Controllers
                     new Claim(ClaimTypes.Role, "admin")
                 };
 
-                var signinKey = new SymmetricSecurityKey(new byte[] {12,32,54,76,43,23, 12, 32, 54, 76, 43, 23 , 12, 32, 54, 76, 43, 23, 12, 32, 54, 76, 43, 23, 12, 32, 54, 76, 43, 23, 12, 32, 54, 76, 43, 23 });
+                var signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("NagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcs"));
 
                 var jwt = new JwtSecurityToken(
                     issuer: "localhost",
