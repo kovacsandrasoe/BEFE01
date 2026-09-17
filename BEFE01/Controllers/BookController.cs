@@ -22,11 +22,7 @@ namespace BEFE01.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BookViewDto>> GetBook(Guid id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null)
-            {
-                return NotFound();
-            }
+            var book = await _context.Books.FirstAsync(t => t.Id == id);
             return _mapper.Map<BookViewDto>(book);
         }
 
@@ -58,11 +54,7 @@ namespace BEFE01.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(Guid id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null)
-            {
-                return NotFound();
-            }
+            var book = await _context.Books.FirstAsync(t =>t.Id == id);
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return Ok();

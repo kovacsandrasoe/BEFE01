@@ -25,7 +25,11 @@ namespace BEFE01
                 
             }, typeof(DtoProfile));
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(cfg =>
+            {
+                cfg.Filters.Add<ExceptionFilter>();
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
