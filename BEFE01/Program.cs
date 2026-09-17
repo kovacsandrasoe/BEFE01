@@ -1,5 +1,6 @@
 
 using BEFE01.Data;
+using BEFE01.Tools;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEFE01
@@ -22,7 +23,7 @@ namespace BEFE01
             builder.Services.AddAutoMapper(cfg =>
             {
                 
-            });
+            }, typeof(DtoProfile));
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
