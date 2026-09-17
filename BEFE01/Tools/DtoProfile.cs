@@ -10,7 +10,14 @@ namespace BEFE01.Tools
         {
             //ide minden kell, amiről engedünk mappelést
             CreateMap<BookCreateDto, Book>();
-            CreateMap<Book, BookViewDto>();
+
+            CreateMap<Book, BookViewDto>()
+                .AfterMap((entity, dto) =>
+                {
+                    //dto.AuthorName = entity.Author != null
+                        //? entity.Author.Name : string.Empty;
+                    dto.AuthorName = entity.Author?.Name ?? string.Empty;
+                });
         }
     }
 }

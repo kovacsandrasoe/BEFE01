@@ -1,4 +1,5 @@
-﻿using BEFE01.Data;
+﻿using AutoMapper;
+using BEFE01.Data;
 using BEFE01.Dtos;
 using BEFE01.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,11 @@ namespace BEFE01.Controllers
     public class BookController : ControllerBase
     {
         private readonly BookDbContext _context;
-        public BookController(BookDbContext context)
+        private readonly IMapper _mapper;
+        public BookController(BookDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
@@ -32,21 +35,11 @@ namespace BEFE01.Controllers
         {
             if (fromYear.HasValue)
             {
-                return await _context.Books.Where(b => b.Year >= fromYear.Value).Select(b => new BookViewDto
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Year = b.Year,
-                    AuthorName = b.Author != null ? b.Author.Name : string.Empty
-                }).ToListAsync();
+                return await _context.Books.Where(b => b.Year >= fromYear.Value)
+                    .Select(b => _mapper.Map<BookViewDto>(b)).ToListAsync();
             }
-            return await _context.Books.Select(b => new BookViewDto
-            {
-                Id = b.Id,
-                Title = b.Title,
-                Year = b.Year,
-                AuthorName = b.Author != null ? b.Author.Name : string.Empty
-            }).ToListAsync();
+            return await 
+                _context.Books.Select(b => _mapper.Map<BookViewDto>(b)).ToListAsync();
         }
 
         [HttpPost]
@@ -56,11 +49,8 @@ namespace BEFE01.Controllers
             {
                 return BadRequest("Title must be at least 3 characters long.");
             }
-            _context.Books.Add(new Book()
-            {
-                Title = dto.Title,
-                Year = dto.Year
-            });
+            var entity = _mapper.Map<Book>(dto);
+            _context.Books.Add(entity);
             await _context.SaveChangesAsync();
             return Ok();
         }
