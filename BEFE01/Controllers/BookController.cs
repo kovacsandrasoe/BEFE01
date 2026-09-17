@@ -20,14 +20,14 @@ namespace BEFE01.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> GetBook(Guid id)
+        public async Task<ActionResult<BookViewDto>> GetBook(Guid id)
         {
             var book = await _context.Books.FindAsync(id);
             if (book == null)
             {
                 return NotFound();
             }
-            return book;
+            return _mapper.Map<BookViewDto>(book);
         }
 
         [HttpGet]
@@ -69,19 +69,10 @@ namespace BEFE01.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(Guid id, Book updatedBook)
+        public async Task<IActionResult> UpdateBook(Guid id, BookUpdateDto dto)
         {
-            if (id != updatedBook.Id)
-            {
-                return BadRequest("ID mismatch.");
-            }
             var book = await _context.Books.FindAsync(id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-            book.Title = updatedBook.Title;
-            book.Year = updatedBook.Year;
+            _mapper.Map(dto, book);
             await _context.SaveChangesAsync();
             return Ok();
         }

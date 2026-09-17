@@ -11,6 +11,8 @@ namespace BEFE01.Tools
             //ide minden kell, amiről engedünk mappelést
             CreateMap<BookCreateDto, Book>();
 
+            CreateMap<BookUpdateDto, Book>();
+
             CreateMap<Book, BookViewDto>()
                 .AfterMap((entity, dto) =>
                 {
