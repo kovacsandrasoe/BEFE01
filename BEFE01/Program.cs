@@ -19,6 +19,11 @@ namespace BEFE01
                 .UseLazyLoadingProxies();
             });
 
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
