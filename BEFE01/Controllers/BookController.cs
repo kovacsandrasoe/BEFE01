@@ -71,7 +71,7 @@ namespace BEFE01.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(Guid id, BookUpdateDto dto)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books.FirstAsync(t => t.Id == id);
             _mapper.Map(dto, book);
             await _context.SaveChangesAsync();
             return Ok();
