@@ -2,6 +2,7 @@
 using BEFE01.Data;
 using BEFE01.Dtos;
 using BEFE01.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ namespace BEFE01.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<BookViewDto>> GetBook(Guid id)
         {
             var book = await _context.Books.FirstAsync(t => t.Id == id);

@@ -25,7 +25,7 @@ namespace BEFE01.Controllers
                     new Claim(ClaimTypes.Role, "admin")
                 };
 
-                var signinKey = new SymmetricSecurityKey(new byte[] {12,32,54,76,43,23});
+                var signinKey = new SymmetricSecurityKey(new byte[] {12,32,54,76,43,23, 12, 32, 54, 76, 43, 23 , 12, 32, 54, 76, 43, 23, 12, 32, 54, 76, 43, 23, 12, 32, 54, 76, 43, 23, 12, 32, 54, 76, 43, 23 });
 
                 var jwt = new JwtSecurityToken(
                     issuer: "localhost",
@@ -35,7 +35,7 @@ namespace BEFE01.Controllers
                     signingCredentials: new 
                     SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256)
                     );
-                return Ok(jwt);
+                return Ok(new JwtSecurityTokenHandler().WriteToken(jwt));
             }
             return Unauthorized();
         }
