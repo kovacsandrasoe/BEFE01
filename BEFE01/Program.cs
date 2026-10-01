@@ -2,6 +2,7 @@
 using BEFE01.Data;
 using BEFE01.Models;
 using BEFE01.Tools;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,12 @@ namespace BEFE01
                 .UseSqlServer(builder.Configuration["db:conn"])
                 .UseLazyLoadingProxies();
             });
+
+            builder.Services.AddHangfire(config =>
+            {
+                config.UseSqlServerStorage(builder.Configuration["db:conn"]);
+            });
+            builder.Services.AddHangfireServer();
 
             builder.Services.AddIdentity<AppUser, IdentityRole>()
                 .AddRoles<IdentityRole>()
@@ -127,6 +134,8 @@ namespace BEFE01
             app.UseAuthorization();
 
             app.UseStaticFiles();
+
+            app.UseHangfireDashboard();
 
             app.MapControllers();
 
