@@ -123,20 +123,25 @@ namespace BEFE01.Controllers
             });
         }
 
-        [Authorize]
         [HttpPost("upload-profile-picture")]
         [DisableRequestSizeLimit]
+        [Authorize]
         public async Task<IActionResult> UploadProfilePicture(IFormFile file)
         {
-            using var stream = new MemoryStream();
+            /*using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
-            return Ok(stream.ToArray());
+            return Ok(stream.ToArray());*/
 
-            /*await using var stream = new FileStream(
+            var user = await _userManager.GetUserAsync(User);
+            var filePath = Path.Combine(
+                Directory.GetCurrentDirectory(), "wwwroot", "profilepictures", user.Id);
+
+            await using var stream = new FileStream(
             filePath,
             FileMode.Create);
 
-            await file.CopyToAsync(stream);*/
+            await file.CopyToAsync(stream);
+            return Ok();
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
