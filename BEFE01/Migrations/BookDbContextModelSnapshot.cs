@@ -42,7 +42,7 @@ namespace BEFE01.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("BEFE01.Models.Person", b =>
@@ -60,7 +60,7 @@ namespace BEFE01.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("People");
+                    b.ToTable("People", (string)null);
                 });
 
             modelBuilder.Entity("BEFE01.Models.Book", b =>
