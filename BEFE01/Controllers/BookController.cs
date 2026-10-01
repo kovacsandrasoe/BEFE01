@@ -2,6 +2,7 @@
 using BEFE01.Data;
 using BEFE01.Dtos;
 using BEFE01.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -63,9 +64,15 @@ namespace BEFE01.Controllers
         public async Task<IActionResult> DeleteBook(Guid id)
         {
             var book = await _context.Books.FirstAsync(t =>t.Id == id);
+            BackgroundJob.Schedule(() => Job(book.AuthorId), TimeSpan.FromSeconds(10));
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return Ok();
+        }
+
+        private void Job(Guid authorId)
+        {
+
         }
 
         [HttpPut("{id}")]
