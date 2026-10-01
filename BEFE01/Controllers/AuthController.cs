@@ -46,6 +46,8 @@ namespace BEFE01.Controllers
             }
         }
 
+
+
         private JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims)
         {
             var signinKey = new SymmetricSecurityKey(
