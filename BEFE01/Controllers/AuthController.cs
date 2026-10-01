@@ -1,4 +1,6 @@
 ﻿using BEFE01.Dtos;
+using BEFE01.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,7 +13,40 @@ namespace BEFE01.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        [HttpPost]
+        private UserManager<AppUser> userManager;
+        private RoleManager<IdentityRole> roleManager;
+        private IConfiguration configuration;
+
+        public AuthController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        {
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.configuration = configuration;
+        }
+
+
+        [HttpPost("register")]
+        public async Task Register(UserCreateDto dto)
+        {
+            var user = new AppUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                EmailConfirmed = true,
+                FamilyName = dto.FamilyName,
+                GivenName = dto.GivenName,
+                RefreshToken = ""
+            };
+            await userManager.CreateAsync(user, dto.Password);
+
+            if (userManager.Users.Count() == 1)
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await userManager.AddToRoleAsync(user, "Admin");
+            }
+        }
+
+        [HttpPost("login")]
         public IActionResult Login(LoginDto dto)
         {
             if (dto.UserName == "test"

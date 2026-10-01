@@ -1,7 +1,9 @@
 
 using BEFE01.Data;
+using BEFE01.Models;
 using BEFE01.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +27,11 @@ namespace BEFE01
                 .UseSqlServer(builder.Configuration["db:conn"])
                 .UseLazyLoadingProxies();
             });
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<BookDbContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddAutoMapper(cfg =>
             {

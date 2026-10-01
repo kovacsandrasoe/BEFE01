@@ -1,10 +1,11 @@
 ﻿using BEFE01.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
 namespace BEFE01.Data
 {
-    public class BookDbContext : DbContext
+    public class BookDbContext : IdentityDbContext<AppUser>
     {
         public DbSet<Book> Books { get; set; }
         public DbSet<Person> People { get; set; }
