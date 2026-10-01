@@ -93,6 +93,55 @@ namespace BEFE01.Controllers
 
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh(TokenApiDto tokenApiDto)
+        {
+            if (tokenApiDto is null)
+                return BadRequest("Invalid client request");
+            string accessToken = tokenApiDto.AccessToken;
+            string refreshToken = tokenApiDto.RefreshToken;
+            var principal = GetPrincipalFromExpiredToken(accessToken);
+            var username = principal?.Identity?.Name;
+
+            var user = await _userManager.GetUserAsync(principal!);
+            if (user is null || user.RefreshToken != refreshToken)
+                return BadRequest("Invalid client request");
+
+            var newAccessToken = GenerateAccessToken(principal?.Claims);
+            var newRefreshToken = await GenerateRefreshToken(user);
+            user.RefreshToken = newRefreshToken;
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new
+            {
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
+                RefreshToken = newRefreshToken,
+                AccessTokenExpiration = newAccessToken.ValidTo,
+                RefreshTokenExpiration = DateTime.Now.AddMinutes(24 * 60 * Convert.ToInt32(_configuration["jwt:refresh_expiry_days"]))
+            });
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                  Encoding.UTF8.GetBytes(_configuration["jwt:key"] ?? "")),
+                ValidateLifetime = false
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+            return principal;
+        }
+
 
 
         private JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims)
