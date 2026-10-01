@@ -126,6 +126,7 @@ namespace BEFE01
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseStaticFiles();
 
             app.MapControllers();
 
