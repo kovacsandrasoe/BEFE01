@@ -3,6 +3,7 @@ using BEFE01.Data;
 using BEFE01.Dtos;
 using BEFE01.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,16 +15,20 @@ namespace BEFE01.Controllers
     {
         private readonly BookDbContext _context;
         private readonly IMapper _mapper;
-        public BookController(BookDbContext context, IMapper mapper)
+
+        private readonly UserManager<AppUser> userManager;
+        public BookController(BookDbContext context, IMapper mapper, UserManager<AppUser> userManager)
         {
             _context = context;
             _mapper = mapper;
+            this.userManager = userManager;
         }
 
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<BookViewDto>> GetBook(Guid id)
         {
+            var actualUser = await userManager.GetUserAsync(this.User);       
             var book = await _context.Books.FirstAsync(t => t.Id == id);
             return _mapper.Map<BookViewDto>(book);
         }
