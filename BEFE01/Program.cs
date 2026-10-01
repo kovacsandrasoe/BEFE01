@@ -105,11 +105,11 @@ namespace BEFE01
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidAudience = "localhost",
-                    ValidIssuer = "localhost",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("NagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcs"))
+                    ValidAudience = builder.Configuration["jwt:audience"],
+                    ValidIssuer = builder.Configuration["jwt:issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwt:key"] ?? throw new Exception("jwt:key not defined in appsettings")))
                 };
-            }); ;
+            });
 
 
             var app = builder.Build();
