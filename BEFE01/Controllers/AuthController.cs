@@ -24,6 +24,26 @@ namespace BEFE01.Controllers
             this.configuration = configuration;
         }
 
+        [HttpPost("register")]
+        public async Task Register(UserCreateDto dto)
+        {
+            var user = new AppUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                EmailConfirmed = true,
+                FamilyName = dto.FamilyName,
+                GivenName = dto.GivenName,
+                RefreshToken = ""
+            };
+            await userManager.CreateAsync(user, dto.Password);
+
+            if (userManager.Users.Count() == 1)
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await userManager.AddToRoleAsync(user, "Admin");
+            }
+        }
 
 
         [HttpPost("login-test")]
