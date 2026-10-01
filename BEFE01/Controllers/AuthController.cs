@@ -46,6 +46,53 @@ namespace BEFE01.Controllers
             }
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLoginDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user != null)
+            {
+                var result = await _userManager.CheckPasswordAsync(user, dto.Password);
+                if (result)
+                {
+                    //van ilyen user és jó a jelszava
+                    //todo: generate token
+                    var claim = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.UserName!),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    };
+
+                    foreach (var role in await _userManager.GetRolesAsync(user))
+                    {
+                        claim.Add(new Claim(ClaimTypes.Role, role));
+                    }
+
+                    var accessToken = GenerateAccessToken(claim);
+                    var refreshToken = await GenerateRefreshToken(user);
+
+                    return Ok(new LoginResultDto()
+                    {
+                        AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                        AccessTokenExpiration = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["jwt:access_expiry_minutes"])),
+                        RefreshToken = refreshToken,
+                        RefreshTokenExpiration = DateTime.Now.AddMinutes(24 * 60 * Convert.ToInt32(_configuration["jwt:refresh_expiry_days"]))
+                    });
+                }
+                else
+                {
+                    throw new ArgumentException("Nem jó a jelszó");
+                    //return BadRequest("Nem jó a jelszó");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Nincs ilyen user");
+                //return BadRequest("Nincs ilyen user");
+            }
+
+        }
+
 
 
         private JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims)
