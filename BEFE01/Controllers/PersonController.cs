@@ -1,5 +1,7 @@
-using BEFE01.Models;
+using AutoMapper;
 using BEFE01.Data;
+using BEFE01.Dtos;
+using BEFE01.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,44 +12,46 @@ namespace BEFE01.Controllers
     public class PersonController : ControllerBase
     {
         private readonly BookDbContext _context;
-        public PersonController(BookDbContext context)
+        private readonly IMapper _mapper;
+        public PersonController(BookDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Person>> GetPerson(Guid id)
+        public async Task<ActionResult<PersonDetailedViewDto>> GetPerson(Guid id)
         {
             var person = await _context.People.FindAsync(id);
             if (person == null)
             {
                 return NotFound();
             }
-            return person;
+            return _mapper.Map<PersonDetailedViewDto>(person);
         }
 
         [HttpGet]
-        public async Task<List<Person>> GetPeople([FromQuery] int? minAge)
+        public async Task<List<PersonShortViewDto>> GetPeople([FromQuery] int? minAge)
         {
             if (minAge.HasValue)
             {
-                return await _context.People.Where(p => p.Age >= minAge.Value).ToListAsync();
+                return await _context.People.Where(p => p.Age >= minAge.Value).Select(z => _mapper.Map<PersonShortViewDto>(z)).ToListAsync();
             }
-            return await _context.People.ToListAsync();
+            return await _context.People.Select(z => _mapper.Map<PersonShortViewDto>(z)).ToListAsync();
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePerson(Person person)
+        public async Task<IActionResult> CreatePerson(PersonCreateDto dto)
         {
-            if (person.Name.Length < 2)
+            if (dto.Name.Length < 2)
             {
                 return BadRequest("Name must be at least 2 characters long.");
             }
-            if (person.Age < 0)
+            if (dto.Age < 0)
             {
                 return BadRequest("Age must be non-negative.");
             }
-            _context.People.Add(person);
+            _context.People.Add(_mapper.Map<Person>(dto));
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -66,19 +70,14 @@ namespace BEFE01.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePerson(Guid id, Person updatedPerson)
+        public async Task<IActionResult> UpdatePerson(Guid id, PersonUpdateDto dto)
         {
-            if (id != updatedPerson.Id)
-            {
-                return BadRequest("ID mismatch.");
-            }
             var person = await _context.People.FindAsync(id);
             if (person == null)
             {
                 return NotFound();
             }
-            person.Name = updatedPerson.Name;
-            person.Age = updatedPerson.Age;
+            _mapper.Map(dto, person);
             await _context.SaveChangesAsync();
             return Ok();
         }

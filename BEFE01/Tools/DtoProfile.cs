@@ -13,6 +13,15 @@ namespace BEFE01.Tools
 
             CreateMap<BookUpdateDto, Book>();
 
+            CreateMap<Person, PersonShortViewDto>();
+            CreateMap<Person, PersonDetailedViewDto>();
+
+            CreateMap<Book, BookShortViewDto>();
+
+            CreateMap<PersonUpdateDto, Person>();
+
+            CreateMap<PersonCreateDto, Person>();
+
             CreateMap<Book, BookViewDto>()
                 .AfterMap((entity, dto) =>
                 {
