@@ -1,4 +1,6 @@
 ﻿using BEFE01.Dtos;
+using BEFE01.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,8 +13,19 @@ namespace BEFE01.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        [HttpPost]
-        public IActionResult Login(LoginDto dto)
+        private UserManager<AppUser> userManager;
+        private RoleManager<IdentityRole> roleManager;
+        private IConfiguration configuration;
+
+        public AuthController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        {
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.configuration = configuration;
+        }
+
+        [HttpPost("login-test")]
+        public IActionResult LoginTest(LoginDto dto)
         {
             if (dto.UserName == "test"
                 && dto.Password == "Almafa123!!!")
