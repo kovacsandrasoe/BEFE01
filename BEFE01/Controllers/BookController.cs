@@ -2,6 +2,7 @@
 using BEFE01.Data;
 using BEFE01.Dtos;
 using BEFE01.Models;
+using BEFE01.Services;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,11 +18,13 @@ namespace BEFE01.Controllers
         private readonly BookDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
-        public BookController(BookDbContext context, IMapper mapper, UserManager<AppUser> userManager)
+        private readonly BookBackgroundService _service;
+        public BookController(BookDbContext context, IMapper mapper, UserManager<AppUser> userManager, BookBackgroundService service)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            _service = service;
         }
 
         [HttpGet("{id}")]
@@ -64,16 +67,17 @@ namespace BEFE01.Controllers
         public async Task<IActionResult> DeleteBook(Guid id)
         {
             var book = await _context.Books.FirstAsync(t =>t.Id == id);
-            BackgroundJob.Schedule(() => Job(book.AuthorId), TimeSpan.FromSeconds(10));
+            BackgroundJob.Schedule(() => _service.Job(book.AuthorId, _context), TimeSpan.FromSeconds(10));
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return Ok();
+
+            //hangfire lehetőségek
+            //aszinkron job: BackgroundService.Enqueue(job)
+            //késleltetett job: BackgroundJob.Schedule(job, mikor)
+            //ismétlődő job: RecurringJob.AddOrUpdate(job, cron kifejezés)
         }
 
-        private void Job(Guid authorId)
-        {
-
-        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(Guid id, BookUpdateDto dto)
