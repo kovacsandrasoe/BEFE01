@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace BEFE01.Data
 {
-    public class BookDbContext : IdentityDbContext
+    public class BookDbContext : IdentityDbContext<AppUser>
     {
         public DbSet<Book> Books { get; set; }
         public DbSet<Person> People { get; set; }
