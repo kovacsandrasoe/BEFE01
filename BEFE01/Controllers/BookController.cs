@@ -3,6 +3,7 @@ using BEFE01.Data;
 using BEFE01.Dtos;
 using BEFE01.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +15,12 @@ namespace BEFE01.Controllers
     {
         private readonly BookDbContext _context;
         private readonly IMapper _mapper;
-        public BookController(BookDbContext context, IMapper mapper)
+        private readonly UserManager<AppUser> _userManager;
+        public BookController(BookDbContext context, IMapper mapper, UserManager<AppUser> userManager)
         {
             _context = context;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [HttpGet("{id}")]
@@ -41,12 +44,19 @@ namespace BEFE01.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateBook(BookCreateDto dto)
         {
+            var user = await _userManager.GetUserAsync(User);
             var entity = _mapper.Map<Book>(dto);
-            _context.Books.Add(entity);
-            await _context.SaveChangesAsync();
-            return Ok();
+            if (user != null)
+            {
+                entity.CreatorId = user.Id;
+                _context.Books.Add(entity);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            return Unauthorized();
         }
 
         [HttpDelete("{id}")]
