@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BEFE01.Controllers
@@ -13,15 +14,15 @@ namespace BEFE01.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private UserManager<AppUser> userManager;
-        private RoleManager<IdentityRole> roleManager;
-        private IConfiguration configuration;
+        private UserManager<AppUser> _userManager;
+        private RoleManager<IdentityRole> _roleManager;
+        private IConfiguration _configuration;
 
         public AuthController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
-            this.userManager = userManager;
-            this.roleManager = roleManager;
-            this.configuration = configuration;
+            this._userManager = userManager;
+            this._roleManager = roleManager;
+            this._configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -36,14 +37,42 @@ namespace BEFE01.Controllers
                 GivenName = dto.GivenName,
                 RefreshToken = ""
             };
-            await userManager.CreateAsync(user, dto.Password);
+            await _userManager.CreateAsync(user, dto.Password);
 
-            if (userManager.Users.Count() == 1)
+            if (_userManager.Users.Count() == 1)
             {
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
-                await userManager.AddToRoleAsync(user, "Admin");
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _userManager.AddToRoleAsync(user, "Admin");
             }
         }
+
+        private JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims)
+        {
+            var signinKey = new SymmetricSecurityKey(
+                  Encoding.UTF8.GetBytes(_configuration["jwt:key"] ?? throw new Exception("jwt:key not found in appsettings.json")));
+
+            return new JwtSecurityToken(
+                  issuer: _configuration["jwt:issuer"],
+                  audience: _configuration["jwt:audience"],
+                  claims: claims?.ToArray(),
+                  expires: DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["jwt:access_expiry_minutes"])),
+                  signingCredentials: new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256)
+                );
+        }
+
+        private async Task<string> GenerateRefreshToken(AppUser user)
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                string result = Convert.ToBase64String(randomNumber);
+                user.RefreshToken = result;
+                await _userManager.UpdateAsync(user);
+                return result;
+            }
+        }
+
 
 
         [HttpPost("login-test")]
