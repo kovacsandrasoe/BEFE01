@@ -13,6 +13,7 @@
 	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.31" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.31" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.31" />
+	<PackageReference Include="MQTTnet" Version="4.3.7.1207" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 

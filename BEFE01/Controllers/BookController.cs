@@ -14,10 +14,12 @@ namespace BEFE01.Controllers
     {
         private readonly BookDbContext _context;
         private readonly IMapper _mapper;
-        public BookController(BookDbContext context, IMapper mapper)
+        private readonly MqttPublisher _publisher;
+        public BookController(BookDbContext context, IMapper mapper, MqttPublisher publisher)
         {
             _context = context;
             _mapper = mapper;
+            _publisher = publisher;
         }
 
         [HttpGet("{id}")]
@@ -46,6 +48,10 @@ namespace BEFE01.Controllers
             var entity = _mapper.Map<Book>(dto);
             _context.Books.Add(entity);
             await _context.SaveChangesAsync();
+
+            var fb = _mapper.Map<BookShortViewDto>(entity);
+            await _publisher.PublishAsync(fb);
+
             return Ok();
         }
 

@@ -82,7 +82,7 @@ namespace BEFE01
                 });
             });
 
-
+            builder.Services.AddSingleton<MqttPublisher>();
 
 
             builder.Services.AddAuthentication(option =>
@@ -118,6 +118,11 @@ namespace BEFE01
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            var mqtt = app.Services
+                .GetRequiredService<MqttPublisher>();
+            mqtt.ConnectAsync();
+
 
 
             app.MapControllers();
