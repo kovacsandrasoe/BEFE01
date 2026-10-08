@@ -82,7 +82,7 @@ namespace BEFE01
                 });
             });
 
-
+            builder.Services.AddSingleton<WebSocketConnectionManager>();
 
 
             builder.Services.AddAuthentication(option =>
@@ -118,6 +118,8 @@ namespace BEFE01
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseWebSockets();
 
 
             app.MapControllers();

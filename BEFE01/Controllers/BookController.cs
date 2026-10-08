@@ -14,10 +14,12 @@ namespace BEFE01.Controllers
     {
         private readonly BookDbContext _context;
         private readonly IMapper _mapper;
-        public BookController(BookDbContext context, IMapper mapper)
+        private readonly WebSocketConnectionManager _manager;
+        public BookController(BookDbContext context, IMapper mapper, WebSocketConnectionManager manager)
         {
             _context = context;
             _mapper = mapper;
+            _manager = manager;
         }
 
         [HttpGet("{id}")]
@@ -46,6 +48,11 @@ namespace BEFE01.Controllers
             var entity = _mapper.Map<Book>(dto);
             _context.Books.Add(entity);
             await _context.SaveChangesAsync();
+
+            //websocket broadcast
+            var fb = _mapper.Map<BookShortViewDto>(entity);
+            await _manager.BroadcastAsync(fb);
+
             return Ok();
         }
 
