@@ -1,7 +1,10 @@
 
 using BEFE01.Data;
+using BEFE01.Models;
 using BEFE01.Tools;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +28,17 @@ namespace BEFE01
                 .UseSqlServer(builder.Configuration["db:conn"])
                 .UseLazyLoadingProxies();
             });
+
+            builder.Services.AddHangfire(config =>
+            {
+                config.UseSqlServerStorage(builder.Configuration["db:conn"]);
+            });
+            builder.Services.AddHangfireServer();
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<BookDbContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddAutoMapper(cfg =>
             {
@@ -98,11 +112,11 @@ namespace BEFE01
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidAudience = "localhost",
-                    ValidIssuer = "localhost",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("NagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcsNagyonhosszútitkosítókulcs"))
+                    ValidAudience = builder.Configuration["jwt:audience"],
+                    ValidIssuer = builder.Configuration["jwt:issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwt:key"] ?? throw new Exception("jwt:key not defined in appsettings")))
                 };
-            }); ;
+            });
 
 
             var app = builder.Build();
@@ -119,6 +133,9 @@ namespace BEFE01
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseStaticFiles();
+
+            app.UseHangfireDashboard();
 
             app.MapControllers();
 

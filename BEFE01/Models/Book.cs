@@ -13,6 +13,8 @@ namespace BEFE01.Models
 
         public int Year { get; set; }
 
+        public string CreatorId { get; set; } = string.Empty;
+
         public Guid AuthorId { get; set; }
 
         [NotMapped]
