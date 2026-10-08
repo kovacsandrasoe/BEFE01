@@ -45,7 +45,7 @@ namespace BEFE01
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
 
-
+            builder.Services.AddSignalR();
 
 
             //builder.Services.AddSwaggerGen();
@@ -119,6 +119,7 @@ namespace BEFE01
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHub<BookHub>("/bookhub");
 
             app.MapControllers();
 

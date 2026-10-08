@@ -4,6 +4,7 @@ using BEFE01.Dtos;
 using BEFE01.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEFE01.Controllers
@@ -14,10 +15,12 @@ namespace BEFE01.Controllers
     {
         private readonly BookDbContext _context;
         private readonly IMapper _mapper;
-        public BookController(BookDbContext context, IMapper mapper)
+        private readonly IHubContext<BookHub> _hub;
+        public BookController(BookDbContext context, IMapper mapper, IHubContext<BookHub> hub)
         {
             _context = context;
             _mapper = mapper;
+            _hub = hub;
         }
 
         [HttpGet("{id}")]
@@ -46,6 +49,10 @@ namespace BEFE01.Controllers
             var entity = _mapper.Map<Book>(dto);
             _context.Books.Add(entity);
             await _context.SaveChangesAsync();
+
+            var fb = _mapper.Map<BookViewDto>(entity);
+            await _hub.Clients.All.SendAsync("BookCreated", fb);
+
             return Ok();
         }
 
